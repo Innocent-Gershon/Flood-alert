@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const AlertSchema = new mongoose.Schema({
   location: {
     type: String,
@@ -38,4 +38,4 @@ const AlertSchema = new mongoose.Schema({
     default: true
   }
 });
-module.exports = mongoose.model('Alert', AlertSchema);
+export default mongoose.model('Alert', AlertSchema);

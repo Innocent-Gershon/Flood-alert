@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MenuIcon, XIcon, BellIcon, AlertTriangleIcon, HomeIcon, LogOutIcon, UserIcon, Settings2Icon, MessageSquareIcon } from 'lucide-react';
 const Sidebar = () => {

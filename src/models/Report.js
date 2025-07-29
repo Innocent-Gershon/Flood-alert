@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const ReportSchema = new mongoose.Schema({
+import mongoose from 'mongoose';
+ const ReportSchema = new mongoose.Schema({
   location: {
     type: String,
     required: true
@@ -35,4 +35,4 @@ const ReportSchema = new mongoose.Schema({
     ref: 'User'
   }
 });
-module.exports = mongoose.model('Report', ReportSchema);
+export default mongoose.model('Report', ReportSchema);

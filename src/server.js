@@ -1,29 +1,64 @@
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const authRoutes = require('./routes/auth');
-const alertRoutes = require('./routes/alerts');
-const reportRoutes = require('./routes/reports');
-// Load environment variables
+// src/server.js
+
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import path from 'path';
+import router from './routes/auth.js';
+import alertRoutes from './routes/alerts.js';
+import reportRoutes from './routes/reports.js';
+
 dotenv.config();
-// Create Express app
+
 const app = express();
-const PORT = process.env.PORT || 5000;
-// Middleware
-app.use(cors());
+const PORT = process.env.PORT || 5050;
+// ✅ CORS: Allow frontend (put before express.json)
+app.use(
+  cors({
+    origin: 'http://localhost:5173', 
+    credentials: true,
+  })
+);
+
+// ✅ Middleware
 app.use(express.json());
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/floodalertghana').then(() => console.log('MongoDB connected')).catch(err => console.error('MongoDB connection error:', err));
-// Routes
-app.use('/api/auth', authRoutes);
+
+
+
+// ✅ MongoDB Connection
+if (!process.env.MONGODB_URI) {
+  console.error('❌ MONGODB_URI is not defined in .env');
+  process.exit(1);
+}
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch((err) => {
+    console.error('❌ MongoDB connection failed:', err.message);
+    process.exit(1);
+  });
+
+// ✅ Routes
+app.use('/api/auth', router);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/reports', reportRoutes);
-// Default route
+
+// ✅ Health Check
+app.get('/api/ping', (req, res) => res.send('pong'));
+
+// ✅ Root Route
 app.get('/', (req, res) => {
-  res.send('Flood Alert Ghana API is running');
+  res.send('🌍 Flood Alert Ghana API is running');
 });
-// Start server
+
+// ✅ Fallback 404
+app.use('/', (req, res) => {
+  res.status(404).json({ message: 'Not Found' });
+});
+
+// ✅ Start Server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

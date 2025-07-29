@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { AlertTriangleIcon, Users2Icon, TruckIcon, PhoneIcon, MapPinIcon, CheckCircleIcon } from 'lucide-react';
 import { floodAlerts, reportedEvents } from '../utils/dummyData';
 const EmergencyResponse = () => {

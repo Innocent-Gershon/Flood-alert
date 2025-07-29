@@ -1,46 +1,60 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Footer from './components/Footer';
-import Login from './pages/Login';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import CommunityReporting from './pages/CommunityReporting';
-import EmergencyResponse from './pages/EmergencyResponse';
-import AdminPanel from './pages/AdminPanel';
-// Protected route wrapper component
-const ProtectedRoute = ({
-  children
-}: {
+import { useEffect, useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from 'react-router-dom';
+import Sidebar from './components/Sidebar.tsx';
+import Footer from './components/Footer.tsx';
+import Login from './pages/Login.js';
+import Home from './pages/Home.tsx';
+import Dashboard from './pages/Dashboard.tsx';
+import CommunityReporting from './pages/CommunityReporting.tsx';
+import EmergencyResponse from './pages/EmergencyResponse.tsx';
+import AdminPanel from './pages/AdminPanel.tsx';
+import Register from './pages/Register.tsx';
+import Contact from './pages/Contact.tsx';
+
+// ✅ ProtectedRoute logic with guest support
+type ProtectedRouteProps = {
   children: React.ReactNode;
-}) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  allowGuest?: boolean;
+};
+
+const ProtectedRoute = ({ children, allowGuest = false }: ProtectedRouteProps) => {
   const location = useLocation();
-  // Check if user has token in localStorage
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    }
-  }, []);
-  // Check if user is coming from login page
-  const fromLogin = location.state?.fromLogin || false;
-  // Consider the user authenticated if they have a token or are coming from login
-  if (!isAuthenticated && !fromLogin) {
-    // Redirect to login page if not authenticated
-    return <Navigate to="/login" replace state={{
-      from: location
-    }} />;
+  const token = localStorage.getItem('token');
+  const isGuest = sessionStorage.getItem('guest') === 'true';
+
+  if (!token && !(allowGuest && isGuest)) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
+
+  // Prevent guests from accessing anything beyond /home
+  if (!token && !allowGuest && isGuest) {
+    return <Navigate to="/login" replace />;
+  }
+
   return <>{children}</>;
 };
+
 export function App() {
-  return <Router>
+  return (
+    <Router>
       <Routes>
-        {/* Login route - accessible to all */}
+        {/* ✅ Public routes */}
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
-        {/* Home route - protected */}
-        <Route path="/" element={<ProtectedRoute>
+        <Route path="/register" element={<Register />} />
+        <Route path="/contact" element={<Contact />} />
+
+        {/* ✅ Home - guests and logged-in users allowed */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute allowGuest>
               <div className="flex min-h-screen bg-gray-50">
                 <Sidebar />
                 <div className="flex flex-col flex-grow md:ml-64">
@@ -50,9 +64,15 @@ export function App() {
                   <Footer />
                 </div>
               </div>
-            </ProtectedRoute>} />
-        {/* Dashboard route - protected */}
-        <Route path="/dashboard" element={<ProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ✅ Logged-in users only */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
               <div className="flex min-h-screen bg-gray-50">
                 <Sidebar />
                 <div className="flex flex-col flex-grow md:ml-64">
@@ -62,9 +82,13 @@ export function App() {
                   <Footer />
                 </div>
               </div>
-            </ProtectedRoute>} />
-        {/* Community reporting route - protected */}
-        <Route path="/community-reporting" element={<ProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/community-reporting"
+          element={
+            <ProtectedRoute>
               <div className="flex min-h-screen bg-gray-50">
                 <Sidebar />
                 <div className="flex flex-col flex-grow md:ml-64">
@@ -74,9 +98,13 @@ export function App() {
                   <Footer />
                 </div>
               </div>
-            </ProtectedRoute>} />
-        {/* Emergency response route - protected */}
-        <Route path="/emergency-response" element={<ProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/emergency-response"
+          element={
+            <ProtectedRoute>
               <div className="flex min-h-screen bg-gray-50">
                 <Sidebar />
                 <div className="flex flex-col flex-grow md:ml-64">
@@ -86,9 +114,13 @@ export function App() {
                   <Footer />
                 </div>
               </div>
-            </ProtectedRoute>} />
-        {/* Admin panel route - protected */}
-        <Route path="/admin" element={<ProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
               <div className="flex min-h-screen bg-gray-50">
                 <Sidebar />
                 <div className="flex flex-col flex-grow md:ml-64">
@@ -98,9 +130,13 @@ export function App() {
                   <Footer />
                 </div>
               </div>
-            </ProtectedRoute>} />
-        {/* Redirect all other routes to login */}
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ✅ Unknown routes redirect to login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
-    </Router>;
+    </Router>
+  );
 }

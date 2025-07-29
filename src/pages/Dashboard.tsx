@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { AlertTriangleIcon, DropletIcon, MapPinIcon, RadioIcon, MessageSquareIcon, PhoneIcon } from 'lucide-react';
 import { floodAlerts, weatherData } from '../utils/dummyData';
 const Dashboard = () => {
