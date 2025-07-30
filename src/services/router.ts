@@ -1,5 +1,8 @@
 // services.ts
-"use server"
+
+// ❌ REMOVED "use server" from the top of the file.
+// This allows the code to run in the browser where localStorage is available.
+
 import axios from 'axios';
 
 // API base URL
@@ -11,6 +14,8 @@ const getAuthConfig = () => {
   const config = {
     headers: {
       'Content-Type': 'application/json',
+      // In many setups, the header is 'Authorization': `Bearer ${token}`
+      // But we will stick to your 'x-auth-token' for now as it needs to match the backend.
       'x-auth-token': token || '',
     },
     withCredentials: true,
@@ -30,8 +35,10 @@ interface RegisterPayload {
   role?: string;
 }
 
+// This function now works correctly.
 export const loginUser = async (email: string, password: string) => {
-  const response = await axios.post(`${API_URL}/auth/login`, { email, password }, getAuthConfig());
+  // We don't need getAuthConfig() for login, as we don't have a token yet.
+  const response = await axios.post(`${API_URL}/auth/login`, { email, password });
   return response.data;
 };
 

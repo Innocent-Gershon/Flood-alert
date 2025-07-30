@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MessageSquareIcon, RadioIcon, PhoneIcon, UserIcon } from 'lucide-react';
-const Home = () => {
+const Homepage = () => {
   return <div className="w-full">
       {/* Hero Section */}
       <section className="relative bg-blue-900 text-white py-16">
@@ -254,4 +254,4 @@ const Home = () => {
       </section>
     </div>;
 };
-export default Home;
+export default Homepage;

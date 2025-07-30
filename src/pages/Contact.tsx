@@ -40,6 +40,11 @@ export default function Contact() {
     }
   };
 
+  // Function to handle navigation back to the landing page
+  const handleGoHome = () => {
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-12 px-4 flex items-center justify-center">
       <div className="w-full max-w-lg bg-white shadow-xl rounded-xl p-6 md:p-8">
@@ -93,6 +98,18 @@ export default function Contact() {
             Send Message
           </button>
         </form>
+
+        {/* --- NEWLY ADDED SECTION --- */}
+        <div className="text-center mt-6">
+          <button
+            onClick={handleGoHome}
+            className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline transition-all"
+          >
+            ← Back to Home
+          </button>
+        </div>
+        {/* --- END OF NEW SECTION --- */}
+
       </div>
     </div>
   );

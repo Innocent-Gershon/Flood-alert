@@ -1,6 +1,6 @@
 // Register.tsx
 import React, { useState, ChangeEvent, FormEvent, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { registerUser } from '../services/router'; // Ensure this path is correct
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
@@ -202,8 +202,31 @@ const Register: React.FC = () => {
             <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-700 group-hover:from-green-500 group-hover:to-green-600 transition-all duration-500 ease-out"></span>
             <span className="relative z-10">Register</span>
           </button>
+          {/* Add this inside the <form> tag, after the register button */}
+          <div className="text-center text-sm mt-6">
+            <p className="text-gray-600">
+              Already have an account?{' '}
+              <Link to="/login" className="font-semibold text-blue-600 hover:text-blue-800 hover:underline">
+                Login
+              </Link>
+            </p>
+          </div>
 
         </form>
+        {/* Add this outside the <form> tag, at the bottom of the card */}
+
+      <div className="text-center mt-6">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-800 bg-transparent rounded-lg border-2 border-gray-300 hover:bg-gray-800 hover:text-white hover:border-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition-all duration-300"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5"></path>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Back to Home
+        </Link>
+      </div>
       </div>
 
       {/* Modal */}
