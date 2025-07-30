@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "next start",
+    "start": "node index.js",
     "inn":"nodemon server.js",
     "dev": "npx vite",
     "build": "npx vite build",
