@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "npm run dev",
-    "inn":"nodemon server.js",
+    "inn": "nodemon server.js",
     "dev": "vite",
     "build": "npx vite build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
@@ -21,6 +21,7 @@
     "i18next": "^25.3.2",
     "i18next-browser-languagedetector": "^8.2.0",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.441.0",
     "mongodb": "^6.18.0",
     "mongoose": "^8.16.4",

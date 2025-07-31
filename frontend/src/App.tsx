@@ -5,9 +5,10 @@ import {
   Route,
   Navigate,
   useLocation,
-  useNavigate, // Import useNavigate
+  useNavigate,
 } from 'react-router-dom';
-import { ShieldOffIcon } from 'lucide-react'; // For the new modal
+import { ShieldOffIcon } from 'lucide-react';
+import { jwtDecode } from 'jwt-decode'; // --- ✅ 1. IMPORT THE DECODING LIBRARY ---
 
 // Component & Page Imports
 import Sidebar from './components/Sidebar.tsx';
@@ -23,8 +24,7 @@ import CommunityReporting from './pages/CommunityReporting.tsx';
 import EmergencyResponse from './pages/EmergencyResponse.tsx';
 import AdminPanel from './pages/AdminPanel.tsx';
 
-// --- ✅ NEW: ACCESS DENIED MODAL ---
-// A stylish pop-up to inform users they don't have access.
+// --- ACCESS DENIED MODAL (No changes here) ---
 const AccessDeniedModal = () => {
   const navigate = useNavigate();
   return (
@@ -40,7 +40,7 @@ const AccessDeniedModal = () => {
           You do not have permission to view this page. This area is restricted to administrators only.
         </p>
         <button
-          onClick={() => navigate(-1)} // Takes the user back to the previous page
+          onClick={() => navigate(-1)}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           Go Back
@@ -50,51 +50,59 @@ const AccessDeniedModal = () => {
   );
 };
 
-
-// --- ✅ UPGRADED: PROTECTED ROUTE WITH ROLE-BASED ACCESS CONTROL ---
+// --- ✅ 2. HELPER FUNCTION & UPGRADED PROTECTED ROUTE ---
 type ProtectedRouteProps = {
   children: React.ReactNode;
   allowGuest?: boolean;
-  roles?: string[]; // New prop to define allowed roles
+  roles?: string[];
+};
+
+/**
+ * Decodes the JWT token from localStorage to get the user's role.
+ * @returns {string|null} The user's role (e.g., 'admin') or null if not found.
+ */
+const getUserRoleFromToken = (): string | null => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return null;
+  }
+  try {
+    // Define the expected structure of the decoded token
+    const decodedToken: { role?: string } = jwtDecode(token);
+    // Return the role, or null if it doesn't exist in the token
+    return decodedToken.role || null;
+  } catch (error) {
+    console.error("Invalid token:", error);
+    // If token is malformed, treat the user as having no role
+    return null;
+  }
 };
 
 const ProtectedRoute = ({ children, allowGuest = false, roles = [] }: ProtectedRouteProps) => {
   const location = useLocation();
   const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('role'); // Get the user's role
+  const userRole = getUserRoleFromToken(); // Get role from the token
   const isGuest = sessionStorage.getItem('guest') === 'true';
 
-  // Guest handling (no changes here)
+  // Guest handling logic (no change)
   if (isGuest) {
     if (allowGuest) {
       return <>{children}</>;
-    } else {
-      return (
-        <Navigate
-          to="/login"
-          replace
-          state={{ message: 'Please log in to access this page. Guest access is limited.' }}
-        />
-      );
     }
+    return <Navigate to="/login" replace state={{ message: 'Please log in to access this page. Guest access is limited.' }} />;
   }
 
-  // Not logged in (no changes here)
+  // User not logged in (no change)
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
   
-  // --- NEW ROLE CHECK ---
-  // If the route requires specific roles AND the user's role is not included...
+  // Role check logic now works correctly with the role from the token
   if (roles.length > 0 && (!userRole || !roles.includes(userRole))) {
-    // ...show the Access Denied modal instead of the page.
     return (
-        <>
-          <AppLayout>
-            {/* We render the modal on top of the existing layout for a seamless experience */}
-            <AccessDeniedModal />
-          </AppLayout>
-        </>
+      <AppLayout>
+        <AccessDeniedModal />
+      </AppLayout>
     );
   }
 
@@ -102,7 +110,7 @@ const ProtectedRoute = ({ children, allowGuest = false, roles = [] }: ProtectedR
   return <>{children}</>;
 };
 
-// AppLayout Component (no changes here)
+// --- APP LAYOUT (No changes here) ---
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
   <div className="flex min-h-screen bg-gray-50">
     <Sidebar />
@@ -115,51 +123,42 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
+// --- APP ROUTES (No changes here) ---
 export function App() {
   return (
     <Router>
       <Routes>
-        {/* --- PUBLIC ROUTES --- */}
+        {/* Public Routes */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* --- PROTECTED ROUTES (now with role definitions) --- */}
-        
-        {/* Home is accessible to guests and all logged-in users */}
+        {/* Protected Routes with Role Definitions */}
         <Route
           path="/home"
           element={
             <ProtectedRoute allowGuest>
-              <AppLayout>
-                <Home />
-              </AppLayout>
+              <AppLayout><Home /></AppLayout>
             </ProtectedRoute>
           }
         />
-
-        {/* Community Reporting is accessible to all logged-in users */}
         <Route
           path="/community-reporting"
           element={
             <ProtectedRoute>
-              <AppLayout>
-                <CommunityReporting />
-              </AppLayout>
+              <AppLayout><CommunityReporting /></AppLayout>
             </ProtectedRoute>
           }
         />
 
-        {/* --- ADMIN-ONLY ROUTES --- */}
+        {/* Admin-Only Routes */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute roles={['admin']}>
-              <AppLayout>
-                <Dashboard />
-              </AppLayout>
+              <AppLayout><Dashboard /></AppLayout>
             </ProtectedRoute>
           }
         />
@@ -167,9 +166,7 @@ export function App() {
           path="/emergency-response"
           element={
             <ProtectedRoute roles={['admin']}>
-              <AppLayout>
-                <EmergencyResponse />
-              </AppLayout>
+              <AppLayout><EmergencyResponse /></AppLayout>
             </ProtectedRoute>
           }
         />
@@ -177,9 +174,7 @@ export function App() {
           path="/admin"
           element={
             <ProtectedRoute roles={['admin']}>
-              <AppLayout>
-                <AdminPanel />
-              </AppLayout>
+              <AppLayout><AdminPanel /></AppLayout>
             </ProtectedRoute>
           }
         />
