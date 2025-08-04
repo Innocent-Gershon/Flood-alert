@@ -1,7 +1,7 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { AlertTriangleIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
-import { loginUser } from '../../../backend/services/router'; // Ensure this path is correct
+import loginUser from '../services/auth.services';
 import bgImage from '../Images/loginbac.jpg'; 
 
 interface Credentials {
